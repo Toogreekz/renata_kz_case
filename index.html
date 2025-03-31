@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пользовательский путь</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .game-container {
+            position: relative;
+            width: 400px;
+            height: 1014px;
+            overflow: hidden;
+            background: url('path.png') no-repeat center/contain;
+        }
+        .character {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            transition: all 1s ease;
+        }
+        .modal, .overlay {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border: 2px solid black;
+        }
+        .overlay {
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+        .button {
+            margin-top: 10px;
+            padding: 10px;
+            cursor: pointer;
+            background: blue;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <img id="character" class="character" src="person.jpg" style="top: 10px; left: 350px;">
+    </div>
+    <div class="overlay" id="overlay"></div>
+    <div class="modal" id="modal">
+        <p id="question"></p>
+        <button class="answer button" onclick="checkAnswer(0)"></button>
+        <button class="answer button" onclick="checkAnswer(1)"></button>
+        <button class="answer button" onclick="checkAnswer(2)"></button>
+        <p id="result" style="color: red; display: none;">Неправильно, попробуйте снова!</p>
+        <button id="nextBtn" class="button" style="display: none;" onclick="nextStep()">Дальше</button>
+    </div>
+    <script>
+        let steps = [
+            { x: 73, y: 350, img: '1.jpg', question: 'Какой цвет небо?', answers: ['Синий', 'Зеленый', 'Красный'], correct: 0 },
+            { x: 366, y: 574, img: '2.jpg', question: 'Сколько ног у кошки?', answers: ['Три', 'Четыре', 'Пять'], correct: 1 },
+            { x: 27, y: 830, img: '3.jpg', question: 'Столица Франции?', answers: ['Берлин', 'Лондон', 'Париж'], correct: 2 }
+        ];
+        let currentStep = -1, startTime;
+        const character = document.getElementById('character');
+        const modal = document.getElementById('modal');
+        const overlay = document.getElementById('overlay');
+        const questionEl = document.getElementById('question');
+        const answerBtns = document.querySelectorAll('.answer');
+        const resultEl = document.getElementById('result');
+        const nextBtn = document.getElementById('nextBtn');
+
+        window.onload = function() {
+            startTime = Date.now();
+            nextStep();
+        };
+
+        function nextStep() {
+            currentStep++;
+            if (currentStep < steps.length) {
+                let step = steps[currentStep];
+                character.style.top = step.y + 'px';
+                character.style.left = step.x + 'px';
+                character.src = step.img;
+                setTimeout(() => showModal(step), 1000);
+            } else {
+                let timeTaken = (Date.now() - startTime) / 1000;
+                alert(timeTaken < 60 ? 'Молодец! Ваш приз - конфета!' : 'Вы прошли тест!');
+            }
+        }
+
+        function showModal(step) {
+            questionEl.textContent = step.question;
+            answerBtns.forEach((btn, index) => {
+                btn.textContent = step.answers[index];
+            });
+            modal.style.display = 'block';
+            overlay.style.display = 'block';
+        }
+
+        function checkAnswer(index) {
+            if (index === steps[currentStep].correct) {
+                resultEl.style.display = 'none';
+                nextBtn.style.display = 'block';
+            } else {
+                resultEl.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

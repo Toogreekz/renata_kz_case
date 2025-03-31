@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Спаси Смайлтаун!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            background-color: #2954a4;
+            overflow-x: hidden;
+        }
+        
+        #app {
+            position: relative;
+            width: 100%;
+            max-width: 414px;
+            min-height: 700px;
+            overflow-y: auto;
+            background-color: #2954a4;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            color: white;
+        }
+        
+        #header-image {
+            width: 50%;
+            display: block;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+        
+        #intro-text {
+            position: absolute;
+            top: 120px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            padding: 0 20px;
+            z-index: 5;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+        
+        #intro-text b {
+            font-weight: bold;
+            font-style: italic;
+        }
+        
+        #path-container {
+            position: relative;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        #path-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        #person {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            transition: all 2s ease-in-out;
+            z-index: 10;
+            top: 500px;
+            left: 1800px;
+            transform: translate(-50%, -50%);
+        }
+        
+        .point {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            z-index: 5;
+            transform: translate(-50%, -50%);
+        }
+        
+        #point1 {
+            top: 1910px;
+            left: 400px;
+        }
+        
+        #point2 {
+            top: 3130px;
+            left: 2000px;
+        }
+        
+        #point3 {
+            top: 4530px;
+            left: 150px;
+        }
+        
+        #start-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 20;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: #2954a4;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            background-color: #264e95;
+            padding: 15px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .modal-body {
+            background-color: white;
+            padding: 20px;
+            border-radius: 0 0 15px 15px;
+            color: #333;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+        }
+        
+        .toothpaste-options {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+        
+        .toothpaste-option {
+            width: 30%;
+            cursor: pointer;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .toothpaste-option:hover {
+            border-color: #2954a4;
+        }
+        
+        .toothpaste-option img {
+            width: 100%;
+            height: 100px;
+            object-fit: contain;
+            display: block;
+        }
+        
+        .feedback {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: pre-line;
+        }
+        
+        .correct-mark::after {
+            content: "✓";
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: green;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .wrong-mark::after {
+            content: "✖";
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: red;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .point-message {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 80%;
+            text-align: center;
+            z-index: 15;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 70px;
+            font-size: 14px;
+            line-height: 1.4;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <img id="header-image" src="oralb.png" alt="Oral-B">
+        <div id="intro-text">Улыбки жителей Смайлтауна под угрозой!\nПомоги городу вновь обрести сияние и\nвыиграй призы от <b>Oral-B</b>!</div>
+        <div id="path-container">
+            <img id="path-image" src="path.png" alt="Путь">
+            <img id="person" src="person.png" alt="Человек" style="display: none;">
+            <img id="point1" class="point" src="1.png" alt="Точка 1" style="display: none;">
+            <img id="point2" class="point" src="2.png" alt="Точка 2" style="display: none;">
+            <img id="point3" class="point" src="3.png" alt="Точка 3" style="display: none;">
+            
+            <div id="point1-message" class="point-message"></div>
+            <div id="point2-message" class="point-message"></div>
+            <div id="point3-message" class="point-message"></div>
+            
+            <button id="start-btn">Начать</button>
+        </div>
+        
+        <div id="question-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <div class="modal-header" id="modal-header-text"></div>
+                <div class="modal-body">
+                    <div class="toothpaste-options" id="toothpaste-options">
+                        <div class="toothpaste-option" data-option="1">
+                            <img src="4.png" alt="Паста 1">
+                        </div>
+                        <div class="toothpaste-option" data-option="2">
+                            <img src="5.png" alt="Паста 2">
+                        </div>
+                        <div class="toothpaste-option" data-option="3">
+                            <img src="6.png" alt="Паста 3">
+                        </div>
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="success-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <div class="modal-header">Поздравляем!</div>
+                <div class="modal-body" style="text-align: center;">
+                    <p>Вы успешно помогли жителям Смайлтауна!</p>
+                    <p>Ваш приз - набор продукции от <b>Oral-B</b>!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы DOM
+            const app = document.getElementById('app');
+            const headerImage = document.getElementById('header-image');
+            const pathImage = document.getElementById('path-image');
+            const person = document.getElementById('person');
+            const point1 = document.getElementById('point1');
+            const point2 = document.getElementById('point2');
+            const point3 = document.getElementById('point3');
+            const startBtn = document.getElementById('start-btn');
+            const questionModal = document.getElementById('question-modal');
+            const successModal = document.getElementById('success-modal');
+            const modalHeaderText = document.getElementById('modal-header-text');
+            const toothpasteOptions = document.getElementById('toothpaste-options');
+            const feedback = document.getElementById('feedback');
+            const closeBtns = document.querySelectorAll('.close-btn');
+            const point1Message = document.getElementById('point1-message');
+            const point2Message = document.getElementById('point2-message');
+            const point3Message = document.getElementById('point3-message');
+            
+            // Сообщения для точек
+            const pointMessages = [
+                "Ольга Николаевна перестала улыбаться из-за чувствительных и склонных к кровоточивости десен. Подбери ей подходящую пасту и верни белоснежную улыбку!",
+                "Иван Петрович страдает от неприятного запаха изо рта. Помоги ему выбрать правильную пасту!",
+                "Анна Сергеевна хочет, чтобы ее зубы были белее. Выбери для нее подходящую пасту!"
+            ];
+            
+            // Правильные ответы для каждой точки (1, 2 или 3 - соответствует data-option)
+            const correctAnswers = [1, 3, 2];
+            
+            // Заголовки модальных окон для каждой точки
+            const modalTitles = [
+                "Выбери пасту для Ольги Николаевны!",
+                "Выбери пасту для Ивана Петровича!",
+                "Выбери пасту для Анны Сергеевны!"
+            ];
+            
+            // Переменные состояния
+            let currentPoint = -1;
+            let startTime = 0;
+            let timerInterval = null;
+            let pathImageWidth = 0;
+            let pathImageHeight = 0;
+            let scaleFactor = 1;
+            let gameStarted = false;
+            
+            // Координаты точек (оригинальные)
+            const originalPersonStart = { x: 1800, y: 500 };
+            const originalPoints = [
+                { x: 400, y: 1910 },
+                { x: 2000, y: 3130 },
+                { x: 150, y: 4530 }
+            ];
+            
+            // Масштабированные координаты
+            let scaledPersonStart = {};
+            let scaledPoints = [];
+            
+            // Инициализация приложения
+            function init() {
+                // Ждем загрузки изображения пути
+                pathImage.onload = function() {
+                    // Получаем фактические размеры изображения после загрузки
+                    pathImageWidth = pathImage.naturalWidth;
+                    pathImageHeight = pathImage.naturalHeight;
+                    
+                    // Вычисляем масштабный коэффициент для вертикального размещения
+                    const containerWidth = document.getElementById('path-container').clientWidth;
+                    scaleFactor = containerWidth / pathImageWidth;
+                    
+                    // Устанавливаем ширину изображения с сохранением пропорций
+                    pathImage.style.width = (pathImageWidth * scaleFactor) + 'px';
+                    pathImage.style.height = 'auto';
+                    
+                    // Масштабируем координаты точек
+                    scaledPersonStart = {
+                        x: originalPersonStart.x * scaleFactor,
+                        y: originalPersonStart.y * scaleFactor
+                    };
+                    
+                    scaledPoints = originalPoints.map(point => ({
+                        x: point.x * scaleFactor,
+                        y: point.y * scaleFactor
+                    }));
+                    
+                    // Устанавливаем начальную позицию персонажа
+                    person.style.left = scaledPersonStart.x + 'px';
+                    person.style.top = scaledPersonStart.y + 'px';
+                    
+                    // Устанавливаем позиции точек
+                    point1.style.left = scaledPoints[0].x + 'px';
+                    point1.style.top = scaledPoints[0].y + 'px';
+                    
+                    point2.style.left = scaledPoints[1].x + 'px';
+                    point2.style.top = scaledPoints[1].y + 'px';
+                    
+                    point3.style.left = scaledPoints[2].x + 'px';
+                    point3.style.top = scaledPoints[2].y + 'px';
+                };
+                
+                // Обработчик кнопки "Начать"
+                startBtn.addEventListener('click', startJourney);
+                
+                // Обработчики закрытия модальных окон
+                closeBtns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        questionModal.style.display = 'none';
+                        successModal.style.display = 'none';
+                    });
+                });
+                
+                // Обработчик кнопки ESC
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        questionModal.style.display = 'none';
+                        successModal.style.display = 'none';
+                    }
+                });
+                
+                // Обработчики выбора пасты
+                document.querySelectorAll('.toothpaste-option').forEach(option => {
+                    option.addEventListener('click', function() {
+                        checkAnswer(parseInt(this.dataset.option));
+                    });
+                });
+                
+                // Обработчик клика по персонажу для повторного открытия модального окна
+                person.addEventListener('click', function() {
+                    if (gameStarted && currentPoint >= 0 && currentPoint < 3) {
+                        showQuestion(currentPoint);
+                    }
+                });
+            }
+            
+            // Начать путешествие
+            function startJourney() {
+                gameStarted = true;
+                startBtn.style.display = 'none';
+                person.style.display = 'block';
+                point1.style.display = 'block';
+                point2.style.display = 'block';
+                point3.style.display = 'block';
+                
+                // Старт таймера (скрытого)
+                startTime = Date.now();
+                timerInterval = setInterval(function() {
+                    // Таймер работает, но не отображается
+                }, 1000);
+                
+                // Перемещаем персонажа к первой точке
+                moveToPoint(0);
+            }
+            
+            // Перемещение к точке
+            function moveToPoint(pointIndex) {
+                currentPoint = pointIndex;
+                const point = scaledPoints[pointIndex];
+                
+                person.style.left = point.x + 'px';
+                person.style.top = point.y + 'px';
+                
+                // Показываем сообщение для точки
+                showPointMessage(pointIndex);
+                
+                // Через 6 секунд показываем модальное окно с вопросом
+                setTimeout(() => {
+                    hidePointMessage(pointIndex);
+                    showQuestion(pointIndex);
+                }, 6000);
+            }
+            
+            // Показать сообщение точки
+            function showPointMessage(pointIndex) {
+                const messageElement = document.getElementById(`point${pointIndex+1}-message`);
+                messageElement.textContent = pointMessages[pointIndex];
+                messageElement.style.display = 'block';
+            }
+            
+            // Скрыть сообщение точки
+            function hidePointMessage(pointIndex) {
+                const messageElement = document.getElementById(`point${pointIndex+1}-message`);
+                messageElement.style.display = 'none';
+            }
+            
+            // Перемещение к следующей точке
+            function moveToNextPoint() {
+                const nextPoint = currentPoint + 1;
+                
+                if (nextPoint < scaledPoints.length) {
+                    moveToPoint(nextPoint);
+                } else {
+                    // Путешествие завершено
+                    journeyCompleted();
+                }
+            }
+            
+            // Показать вопрос
+            function showQuestion(pointIndex) {
+                modalHeaderText.textContent = modalTitles[pointIndex];
+                
+                // Сбрасываем состояние вариантов ответов
+                document.querySelectorAll('.toothpaste-option').forEach(option => {
+                    option.classList.remove('correct-mark', 'wrong-mark');
+                });
+                
+                feedback.textContent = '';
+                
+                questionModal.style.display = 'flex';
+            }
+            
+            // Проверить ответ
+            function checkAnswer(selectedOption) {
+                const correctOption = correctAnswers[currentPoint];
+                const options = document.querySelectorAll('.toothpaste-option');
+                
+                // Сбрасываем все отметки
+                options.forEach(option => {
+                    option.classList.remove('correct-mark', 'wrong-mark');
+                });
+                
+                if (selectedOption === correctOption) {
+                    // Правильный ответ
+                    options[selectedOption-1].classList.add('correct-mark');
+                    feedback.textContent = "Верно!";
+                    
+                    // Закрываем модальное окно через 1.5 секунды
+                    setTimeout(() => {
+                        questionModal.style.display = 'none';
+                        moveToNextPoint();
+                    }, 1500);
+                } else {
+                    // Неправильный ответ
+                    options[selectedOption-1].classList.add('wrong-mark');
+                    feedback.textContent = "Неверно,\nпопробуй еще!";
+                }
+            }
+            
+            // Путешествие завершено
+            function journeyCompleted() {
+                clearInterval(timerInterval);
+                
+                // Проверяем время прохождения
+                const elapsed = (Date.now() - startTime) / 1000;
+                if (elapsed < 60) {
+                    successModal.style.display = 'flex';
+                }
+            }
+            
+            // Запускаем приложение
+            init();
+        });
+    </script>
+</body>
+</html>
