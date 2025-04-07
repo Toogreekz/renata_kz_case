@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Фото</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        .phone-container {
+            width: 100%;
+            max-width: 414px;
+            background-color: white;
+            position: relative;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .intro-text {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .example-image {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        
+        .upload-section {
+            margin-top: 20px;
+        }
+        
+        .upload-title {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .image-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .image-pair {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .image-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .image-box {
+            width: 100%;
+            height: 200px;
+            background-color: #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .upload-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #4285f4;
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s;
+        }
+        
+        .upload-btn:hover {
+            background-color: #3367d6;
+        }
+        
+        .upload-btn input {
+            display: none;
+        }
+        
+        .processing {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #666;
+            display: none;
+        }
+        
+        .next-page {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #666;
+            display: none;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @media (min-width: 768px) {
+            body {
+                padding: 20px 0;
+            }
+            
+            .phone-container {
+                min-height: calc(100vh - 40px);
+                border-radius: 20px;
+                overflow: hidden;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="content">            
+            <!-- Единая картинка с примером "До/После" -->
+            <img src="123.jpg" alt="Пример обработки фото" class="example-image">
+            
+            <div class="upload-section">
+                <div class="upload-title">Попробуйте сами</div>
+                
+                <div class="image-container">
+                    <div class="image-pair">
+                        <div class="image-label">Ваше фото:</div>
+                        <div class="image-box" id="originalImageBox">
+                            <!-- Здесь будет загруженное фото -->
+                        </div>
+                    </div>
+                    <div class="image-pair">
+                        <div class="image-label">Результат:</div>
+                        <div class="image-box" id="processedImageBox">
+                            <!-- Здесь будет обработанное фото -->
+                        </div>
+                    </div>
+                </div>
+                
+                <label class="upload-btn">
+                    Загрузить фото
+                    <input type="file" id="fileInput" accept="image/*">
+                </label>
+                
+                <div class="processing" id="processing">
+                    Идет обработка фото AI...
+                </div>
+                
+                <div class="next-page" id="nextPage">
+                    Переходим к музыке...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const processedImages = [
+            'https://via.placeholder.com/300x300/4CAF50/FFFFFF?text=AI+Ваш+1',
+            'https://via.placeholder.com/300x300/2196F3/FFFFFF?text=AI+Ваш+2',
+            'https://via.placeholder.com/300x300/9C27B0/FFFFFF?text=AI+Ваш+3',
+            'https://via.placeholder.com/300x300/FF9800/FFFFFF?text=AI+Ваш+4',
+            'https://via.placeholder.com/300x300/607D8B/FFFFFF?text=AI+Ваш+5'
+        ];
+        
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            document.getElementById('processing').style.display = 'block';
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const originalImageBox = document.getElementById('originalImageBox');
+                originalImageBox.innerHTML = `<img src="${event.target.result}" alt="Загруженное фото">`;
+                
+                setTimeout(function() {
+                    document.getElementById('processing').style.display = 'none';
+                    
+                    const randomImage = processedImages[Math.floor(Math.random() * processedImages.length)];
+                    const processedImageBox = document.getElementById('processedImageBox');
+                    processedImageBox.innerHTML = `<img src="${randomImage}" alt="Обработанное фото">`;
+                    
+                    // Показываем сообщение о переходе
+                    document.getElementById('nextPage').style.display = 'block';
+                    
+                    // Переход на следующую страницу через 3 секунды
+                    setTimeout(() => {
+                        window.location.href = 'music.html';
+                    }, 3000);
+                }, 5000);
+            };
+            reader.readAsDataURL(file);
+        });
+    </script>
+</body>
+</html>

@@ -19,36 +19,38 @@
             min-height: 100vh;
             background-color: #2954a4;
             overflow-x: hidden;
+            /* Добавляем основной скролл для body */
+            overflow-y: auto;
         }
         
         #app {
             position: relative;
             width: 100%;
             max-width: 414px;
-            min-height: 700px;
-            overflow-y: auto;
+            min-height: 100vh; /* Изменено с 667px */
+            /* Убираем внутренний скролл */
+            /* overflow-y: auto; */
             background-color: #2954a4;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             color: white;
         }
         
         #header-image {
-            width: 50%;
+            width: 100%;
+            height: auto;
             display: block;
-            margin: 0 auto;
-            padding: 20px 0;
+            position: relative;
+            z-index: 30;
         }
         
         #intro-text {
-            position: absolute;
-            top: 120px;
-            left: 0;
-            right: 0;
+            position: relative;
+            z-index: 30;
             text-align: center;
-            padding: 0 20px;
-            z-index: 5;
+            padding: 10px 20px;
             font-size: 16px;
             line-height: 1.4;
+            margin-bottom: 10px;
         }
         
         #intro-text b {
@@ -59,49 +61,52 @@
         #path-container {
             position: relative;
             width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
+            height: calc(100% - 150px);
         }
         
         #path-image {
-            max-width: 100%;
-            height: auto;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
             display: block;
         }
         
         #person {
             position: absolute;
-            width: 70px;
-            height: 70px;
+            width: 90px;
+            height: 90px;
             transition: all 2s ease-in-out;
             z-index: 10;
-            top: 500px;
-            left: 1800px;
             transform: translate(-50%, -50%);
         }
         
         .point {
             position: absolute;
-            width: 70px;
-            height: 70px;
+            width: 90px;
+            height: 90px;
             z-index: 5;
             transform: translate(-50%, -50%);
         }
         
         #point1 {
-            top: 1910px;
-            left: 400px;
+            top: 35%;
+            left: 20%;
+            display: none;
+            position: absolute;
         }
         
         #point2 {
-            top: 3130px;
-            left: 2000px;
+            top: 55%;
+            left: 75%;
+            display: none;
+            position: absolute;
         }
         
         #point3 {
-            top: 4530px;
-            left: 150px;
+            top: 80%;
+            left: 25%;
+            display: none;
+            position: absolute;
         }
         
         #start-btn {
@@ -238,26 +243,39 @@
         
         .point-message {
             position: absolute;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: #264e95;
             color: white;
-            padding: 10px;
-            border-radius: 8px;
-            max-width: 80%;
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 60%;
             text-align: center;
             z-index: 15;
-            left: 50%;
-            transform: translateX(-50%);
-            bottom: 70px;
             font-size: 14px;
             line-height: 1.4;
             display: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        #point1-message {
+            left: 60%;
+            top: 35%;
+        }
+        
+        #point2-message {
+            right: 60%;
+            top: 55%;
+        }
+        
+        #point3-message {
+            left: 60%;
+            top: 80%;
         }
     </style>
 </head>
 <body>
     <div id="app">
         <img id="header-image" src="oralb.png" alt="Oral-B">
-        <div id="intro-text">Улыбки жителей Смайлтауна под угрозой!\nПомоги городу вновь обрести сияние и\nвыиграй призы от <b>Oral-B</b>!</div>
+        <div id="intro-text">Улыбки жителей Смайлтауна под угрозой! Помоги городу вновь обрести сияние и выиграй призы от <b>Oral-B</b>!</div>
         <div id="path-container">
             <img id="path-image" src="path.png" alt="Путь">
             <img id="person" src="person.png" alt="Человек" style="display: none;">
@@ -347,65 +365,10 @@
             let currentPoint = -1;
             let startTime = 0;
             let timerInterval = null;
-            let pathImageWidth = 0;
-            let pathImageHeight = 0;
-            let scaleFactor = 1;
             let gameStarted = false;
-            
-            // Координаты точек (оригинальные)
-            const originalPersonStart = { x: 1800, y: 500 };
-            const originalPoints = [
-                { x: 400, y: 1910 },
-                { x: 2000, y: 3130 },
-                { x: 150, y: 4530 }
-            ];
-            
-            // Масштабированные координаты
-            let scaledPersonStart = {};
-            let scaledPoints = [];
             
             // Инициализация приложения
             function init() {
-                // Ждем загрузки изображения пути
-                pathImage.onload = function() {
-                    // Получаем фактические размеры изображения после загрузки
-                    pathImageWidth = pathImage.naturalWidth;
-                    pathImageHeight = pathImage.naturalHeight;
-                    
-                    // Вычисляем масштабный коэффициент для вертикального размещения
-                    const containerWidth = document.getElementById('path-container').clientWidth;
-                    scaleFactor = containerWidth / pathImageWidth;
-                    
-                    // Устанавливаем ширину изображения с сохранением пропорций
-                    pathImage.style.width = (pathImageWidth * scaleFactor) + 'px';
-                    pathImage.style.height = 'auto';
-                    
-                    // Масштабируем координаты точек
-                    scaledPersonStart = {
-                        x: originalPersonStart.x * scaleFactor,
-                        y: originalPersonStart.y * scaleFactor
-                    };
-                    
-                    scaledPoints = originalPoints.map(point => ({
-                        x: point.x * scaleFactor,
-                        y: point.y * scaleFactor
-                    }));
-                    
-                    // Устанавливаем начальную позицию персонажа
-                    person.style.left = scaledPersonStart.x + 'px';
-                    person.style.top = scaledPersonStart.y + 'px';
-                    
-                    // Устанавливаем позиции точек
-                    point1.style.left = scaledPoints[0].x + 'px';
-                    point1.style.top = scaledPoints[0].y + 'px';
-                    
-                    point2.style.left = scaledPoints[1].x + 'px';
-                    point2.style.top = scaledPoints[1].y + 'px';
-                    
-                    point3.style.left = scaledPoints[2].x + 'px';
-                    point3.style.top = scaledPoints[2].y + 'px';
-                };
-                
                 // Обработчик кнопки "Начать"
                 startBtn.addEventListener('click', startJourney);
                 
@@ -438,6 +401,10 @@
                         showQuestion(currentPoint);
                     }
                 });
+                
+                // Начальная позиция персонажа (верх экрана)
+                person.style.top = '20%';
+                person.style.left = '50%';
             }
             
             // Начать путешествие
@@ -445,28 +412,40 @@
                 gameStarted = true;
                 startBtn.style.display = 'none';
                 person.style.display = 'block';
-                point1.style.display = 'block';
-                point2.style.display = 'block';
-                point3.style.display = 'block';
                 
-                // Старт таймера (скрытого)
-                startTime = Date.now();
-                timerInterval = setInterval(function() {
-                    // Таймер работает, но не отображается
-                }, 1000);
+                // Показываем точки
+                [point1, point2, point3].forEach(point => {
+                    point.style.display = 'block';
+                    // Принудительный рефлоу для корректного позиционирования
+                    void point.offsetHeight;
+                });
+
+                // Стартовая позиция персонажа
+                person.style.top = '20%';
+                person.style.left = '50%';
                 
-                // Перемещаем персонажа к первой точке
-                moveToPoint(0);
+                // Запускаем перемещение к первой точке через небольшую задержку
+                setTimeout(() => moveToPoint(0), 100);
             }
             
             // Перемещение к точке
             function moveToPoint(pointIndex) {
                 currentPoint = pointIndex;
-                const point = scaledPoints[pointIndex];
+                const targetPoint = document.getElementById(`point${pointIndex+1}`);
                 
-                person.style.left = point.x + 'px';
-                person.style.top = point.y + 'px';
+                // Получаем позиции точки относительно контейнера
+                const containerRect = pathContainer.getBoundingClientRect();
+                const pointRect = targetPoint.getBoundingClientRect();
                 
+                // Рассчитываем позиции в процентах
+                const top = ((pointRect.top - containerRect.top) / containerRect.height) * 100;
+                const left = ((pointRect.left - containerRect.left) / containerRect.width) * 100;
+                
+                // Применяем анимацию к персонажу
+                person.style.transition = 'all 2s ease-in-out';
+                person.style.top = `${top}%`;
+                person.style.left = `${left}%`;
+
                 // Показываем сообщение для точки
                 showPointMessage(pointIndex);
                 
@@ -494,7 +473,7 @@
             function moveToNextPoint() {
                 const nextPoint = currentPoint + 1;
                 
-                if (nextPoint < scaledPoints.length) {
+                if (nextPoint < 3) {
                     moveToPoint(nextPoint);
                 } else {
                     // Путешествие завершено

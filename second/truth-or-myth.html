@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Правда или миф?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        .phone-container {
+            width: 100%;
+            max-width: 414px;
+            background-color: white;
+            position: relative;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .content {
+            padding: 20px;
+            padding-bottom: 40px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .facts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .fact {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .fact.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .fact-text {
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-truth {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .btn-myth {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .answer {
+            display: none;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            background-color: #f8f8f8;
+            border-left: 4px solid #4285f4;
+        }
+        
+        .answer.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        .correct {
+            color: #4CAF50;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .explanation {
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .next-page {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 16px;
+            color: #666;
+            display: none;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @media (min-width: 768px) {
+            body {
+                padding: 20px 0;
+            }
+            
+            .phone-container {
+                min-height: calc(100vh - 40px);
+                border-radius: 20px;
+                overflow: hidden;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="content">
+            <h1>Правда или миф?</h1>
+            
+            <div class="facts-container" id="factsContainer">
+                <!-- Факты будут добавляться динамически -->
+            </div>
+            
+            <div class="next-page" id="nextPage">
+                Переходим к следующему этапу...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const factsData = [
+            {
+                text: "Если зубы внешне выглядят здоровыми и не беспокоят, значит ко врачу можно не ходить",
+                isTruth: false,
+                explanation: "К стоматологу нужно ходить раз в полгода на гигиеническую чистку, во время которой врач специальным прибором снимет тот налет, который вы никак не сможете удалить дома и проведет профилактический осмотр зубов и полости рта."
+            },
+            {
+                text: "Отбеливающие пасты портят зубы",
+                isTruth: false,
+                explanation: "Отбеливающие пасты зубы не портят, а пользу приносят значительную. Например, клинически доказано, что зубная паста Oral-B 3D White Бережная мята удаляет до 87% пятен с поверхности зубов и начинает отбеливать уже после 1 чистки зубов. Клинически протестирована, разработана профессионалами."
+            },
+            {
+                text: "Чистить зубы необходимо не менее двух минут",
+                isTruth: true,
+                explanation: "Стоматологи рекомендуют чистить зубы не менее двух минут или чуть больше, если этого времени не хватило на каждый зуб. Чтобы тебе было проще засекать это время, мы подготовили специальный плейлист для чистки зубов! Выбирай идеально подходящую по длительности композицию: 2:00 - 2:30. Просто включай музыку и чисти зубы, наслаждаясь отличными треками!"
+            }
+        ];
+        
+        let currentFactIndex = 0;
+        const factsContainer = document.getElementById('factsContainer');
+        const nextPage = document.getElementById('nextPage');
+        
+        function showNextFact() {
+            if (currentFactIndex < factsData.length) {
+                const fact = factsData[currentFactIndex];
+                
+                const factElement = document.createElement('div');
+                factElement.className = 'fact';
+                factElement.innerHTML = `
+                    <div class="fact-text">${fact.text}</div>
+                    <div class="buttons">
+                        <button class="btn btn-truth" onclick="checkAnswer(this, ${currentFactIndex}, true)">Правда</button>
+                        <button class="btn btn-myth" onclick="checkAnswer(this, ${currentFactIndex}, false)">Миф</button>
+                    </div>
+                    <div class="answer" id="answer${currentFactIndex}">
+                        <div class="correct">${fact.isTruth ? 'Правда' : 'Неправда'}</div>
+                        ${fact.explanation ? `<div class="explanation">${fact.explanation}</div>` : ''}
+                    </div>
+                `;
+                
+                factsContainer.appendChild(factElement);
+                
+                // Показываем с анимацией
+                setTimeout(() => {
+                    factElement.classList.add('show');
+                }, 50);
+                
+                currentFactIndex++;
+            } else {
+                // Все факты показаны
+                nextPage.style.display = 'block';
+                setTimeout(() => {
+                    window.location.href = 'ai-photo.html';
+                }, 3000);
+            }
+        }
+        
+        function checkAnswer(button, factIndex, userAnswer) {
+            const fact = factsData[factIndex];
+            const buttons = button.parentElement.querySelectorAll('.btn');
+            const answerElement = document.getElementById(`answer${factIndex}`);
+            
+            // Отключаем все кнопки
+            buttons.forEach(btn => {
+                btn.classList.add('disabled');
+                btn.disabled = true;
+            });
+            
+            // Подсвечиваем выбранный ответ
+            if (userAnswer === fact.isTruth) {
+                button.style.backgroundColor = '#4CAF50';
+            } else {
+                button.style.backgroundColor = '#f44336';
+            }
+            
+            // Показываем правильный ответ
+            answerElement.classList.add('show');
+            
+            // Через 3 секунды показываем следующий факт
+            setTimeout(showNextFact, 3000);
+        }
+        
+        // Показываем первый факт при загрузке
+        showNextFact();
+    </script>
+</body>
+</html>
