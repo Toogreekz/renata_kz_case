@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        .phone-container {
+            width: 100%;
+            max-width: 414px;
+            background-color: white;
+            position: relative;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+        
+        .product-image-container {
+            width: 100%;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 10px;
+        }
+        
+        .product-image {
+            width: 100%;
+            height: auto;
+            max-height: 100%;
+            object-fit: contain;
+            transition: opacity 0.5s ease;
+        }
+        
+        .buy-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #4285f4;
+            color: white;
+            text-align: center;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .buy-btn:hover {
+            background-color: #3367d6;
+        }
+        
+        @media (min-width: 768px) {
+            body {
+                padding: 20px 0;
+            }
+            
+            .phone-container {
+                min-height: calc(100vh - 40px);
+                border-radius: 20px;
+                overflow: hidden;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="product-image-container">
+            <img src="assets/3.jpg" alt="Товар" class="product-image" id="productImage">
+        </div>
+        <button class="buy-btn" id="buyBtn">Купить</button>
+    </div>
+
+    <script>
+        const productImage = document.getElementById('productImage');
+        const buyBtn = document.getElementById('buyBtn');
+        
+        buyBtn.addEventListener('click', function() {
+            // Меняем картинку
+            productImage.src = 'assets/4.jpg';
+            
+            // Блокируем кнопку после нажатия
+            buyBtn.disabled = true;
+            buyBtn.style.opacity = '0.7';
+            buyBtn.textContent = 'Спасибо за покупку!';
+            
+            // Увеличиваем задержку перед перенаправлением до 3 секунд
+            setTimeout(() => {
+                window.location.href = 'ai-photo.html';
+            }, 3000);
+        });
+
+        // Функция для подгонки размера изображения
+        function adjustImageSize() {
+            const container = document.querySelector('.product-image-container');
+            const img = document.getElementById('productImage');
+            
+            // Рассчитываем максимальную высоту с учетом кнопки
+            const maxHeight = window.innerHeight - 70; // 70px - примерная высота кнопки и отступов
+            
+            if (img.naturalHeight > maxHeight) {
+                img.style.width = 'auto';
+                img.style.height = maxHeight + 'px';
+            } else {
+                img.style.width = '100%';
+                img.style.height = 'auto';
+            }
+        }
+
+        // Вызываем при загрузке и изменении размера окна
+        window.addEventListener('load', adjustImageSize);
+        window.addEventListener('resize', adjustImageSize);
+    </script>
+</body>
+</html>

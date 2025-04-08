@@ -103,20 +103,12 @@
             background-color: #4CAF50;
         }
         
-        .playlist-link {
-            display: block;
+        .next-page {
             text-align: center;
-            padding: 15px;
-            background-color: #4285f4;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
+            margin-top: 30px;
             font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        
-        .playlist-link:hover {
-            background-color: #3367d6;
+            color: #666;
+            display: none;
         }
         
         @media (min-width: 768px) {
@@ -139,7 +131,7 @@
             
             <div class="playlist">
                 <div class="track">
-                    <img src="https://via.placeholder.com/50x50/FF5733/FFFFFF?text=Cover1" alt="Обложка" class="track-cover">
+                    <img src="assets/12.jpg" alt="Обложка" class="track-cover">
                     <div class="track-info">
                         <div class="track-title">Teeth</div>
                         <div class="track-artist">5 Seconds of summer</div>
@@ -149,7 +141,7 @@
                 </div>
                 
                 <div class="track">
-                    <img src="https://via.placeholder.com/50x50/33FF57/FFFFFF?text=Cover2" alt="Обложка" class="track-cover">
+                    <img src="assets/13.jpg" alt="Обложка" class="track-cover">
                     <div class="track-info">
                         <div class="track-title">Абракадабра</div>
                         <div class="track-artist">Lady Gaga</div>
@@ -159,7 +151,7 @@
                 </div>
                 
                 <div class="track">
-                    <img src="https://via.placeholder.com/50x50/3357FF/FFFFFF?text=Cover3" alt="Обложка" class="track-cover">
+                    <img src="assets/14.jpg" alt="Обложка" class="track-cover">
                     <div class="track-info">
                         <div class="track-title">Dentist</div>
                         <div class="track-artist">Hot Fox Karaoke</div>
@@ -169,9 +161,9 @@
                 </div>
             </div>
             
-            <a href="https://music.yandex.ru" class="playlist-link" target="_blank">
-                Открыть в Яндекс.Музыке
-            </a>
+            <div class="next-page" id="nextPage">
+                Переходим в магазин...
+            </div>
         </div>
     </div>
 
@@ -179,6 +171,7 @@
         const playButtons = document.querySelectorAll('.play-button');
         let playedTracks = 0;
         const totalTracks = 3;
+        const nextPage = document.getElementById('nextPage');
         
         playButtons.forEach(button => {
             button.addEventListener('click', function() {
@@ -191,14 +184,14 @@
                     this.classList.add('played');
                     playedTracks++;
                     
-                    // Показываем уведомление
-                    alert(`Воспроизводится: ${title}`);
-                    
                     // Проверяем, все ли треки проиграны
                     if (playedTracks === totalTracks) {
-                        // Переход на страницу с призом через 2 секунды
+                        // Показываем сообщение о переходе
+                        nextPage.style.display = 'block';
+                        
+                        // Переход на страницу магазина через 2 секунды
                         setTimeout(() => {
-                            window.location.href = 'prize.html';
+                            window.location.href = 'shop.html';
                         }, 2000);
                     }
                 }

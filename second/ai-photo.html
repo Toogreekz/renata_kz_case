@@ -97,6 +97,13 @@
             object-fit: contain;
         }
         
+        .promo-image {
+            width: 100%;
+            margin: 15px 0;
+            border-radius: 8px;
+            display: none; /* Сначала скрыта */
+        }
+        
         .upload-btn {
             display: block;
             width: 100%;
@@ -156,8 +163,7 @@
 <body>
     <div class="phone-container">
         <div class="content">            
-            <!-- Единая картинка с примером "До/После" -->
-            <img src="123.jpg" alt="Пример обработки фото" class="example-image">
+            <img src="assets/123.jpg" alt="Пример обработки фото" class="example-image">
             
             <div class="upload-section">
                 <div class="upload-title">Попробуйте сами</div>
@@ -177,6 +183,9 @@
                     </div>
                 </div>
                 
+                <!-- Новая промо-картинка -->
+                <img src="assets/5.jpg" alt="Специальное предложение" class="promo-image" id="promoImage">
+                
                 <label class="upload-btn">
                     Загрузить фото
                     <input type="file" id="fileInput" accept="image/*">
@@ -187,7 +196,7 @@
                 </div>
                 
                 <div class="next-page" id="nextPage">
-                    Переходим к музыке...
+                    Переходим к призу...
                 </div>
             </div>
         </div>
@@ -195,11 +204,12 @@
 
     <script>
         const processedImages = [
-            'https://via.placeholder.com/300x300/4CAF50/FFFFFF?text=AI+Ваш+1',
-            'https://via.placeholder.com/300x300/2196F3/FFFFFF?text=AI+Ваш+2',
-            'https://via.placeholder.com/300x300/9C27B0/FFFFFF?text=AI+Ваш+3',
-            'https://via.placeholder.com/300x300/FF9800/FFFFFF?text=AI+Ваш+4',
-            'https://via.placeholder.com/300x300/607D8B/FFFFFF?text=AI+Ваш+5'
+            'assets/6.jpg',
+            'assets/7.jpg',
+            'assets/8.jpg',
+            'assets/9.jpg',
+            'assets/10.jpg',
+            'assets/11.jpg'
         ];
         
         document.getElementById('fileInput').addEventListener('change', function(e) {
@@ -220,12 +230,15 @@
                     const processedImageBox = document.getElementById('processedImageBox');
                     processedImageBox.innerHTML = `<img src="${randomImage}" alt="Обработанное фото">`;
                     
+                    // Показываем промо-картинку
+                    document.getElementById('promoImage').style.display = 'block';
+                    
                     // Показываем сообщение о переходе
                     document.getElementById('nextPage').style.display = 'block';
                     
-                    // Переход на следующую страницу через 3 секунды
+                    // Переход на страницу с призом через 3 секунды
                     setTimeout(() => {
-                        window.location.href = 'music.html';
+                        window.location.href = 'prize.html';
                     }, 3000);
                 }, 5000);
             };
